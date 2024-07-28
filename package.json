@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "help-desk": "pnpm -F help-desk dev"
+    "help-desk": "pnpm -F help-desk dev",
+    "client": "pnpm -F help-desk-client dev"
   },
   "keywords": [],
   "author": "",
