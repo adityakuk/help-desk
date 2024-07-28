@@ -2,7 +2,9 @@
   "name": "help-desk",
   "version": "1.0.0",
   "description": "",
-  "scripts": {},
+  "scripts": {
+    "help-desk": "pnpm -F help-desk dev"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
