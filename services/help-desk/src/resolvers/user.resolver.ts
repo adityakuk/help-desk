@@ -1,6 +1,6 @@
 import { Arg, Field, InputType, Mutation, Query, Resolver } from "type-graphql";
 import { UserEntity } from "../entities/user.entity"
-import { error } from "console";
+import bcrypt from "bcrypt"; // Import bcrypt
 
 @InputType()
 export class CreateUserInput {
@@ -45,7 +45,14 @@ export class UserResolver {
   async createUser(
     @Arg("data") data: CreateUserInput
   ):Promise<UserEntity> {
-    const user = UserEntity.create(data as UserEntity)
+    if(!data.password){
+      throw new Error("phone is required")
+    }
+    const hashPassword = await bcrypt.hash(data?.password, 10)
+    const user = UserEntity.create({
+      ...data,
+      password: hashPassword
+    } as UserEntity)
     await user.save()
     return user
   }
@@ -75,4 +82,5 @@ export class UserResolver {
     await user.remove();
     return true
   }
+
 }
