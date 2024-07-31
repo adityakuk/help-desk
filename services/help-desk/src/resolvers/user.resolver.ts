@@ -1,8 +1,9 @@
-import { Arg, Field, InputType, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { UserEntity } from "../entities/user.entity"
-import bcrypt from "bcrypt"; // Import bcrypt
+import bcrypt from "bcrypt"; 
+import { createTokens } from "./user.token"
 
-@InputType()
+  @InputType()
 export class CreateUserInput {
   @Field()
   userName?: string;
@@ -32,6 +33,18 @@ export class UpdateUserInput {
   phoneNumber?: string;
 }
 
+@ObjectType()
+class AuthResponse {
+  @Field()
+  user!: UserEntity;
+
+  @Field()
+  accessToken!: string
+
+  @Field()
+  refreshToken!: string
+}
+
 @Resolver() 
 export class UserResolver {
   
@@ -41,10 +54,10 @@ export class UserResolver {
     return user
   }
 
-  @Mutation(() => UserEntity)
+  @Mutation(() => AuthResponse)
   async createUser(
     @Arg("data") data: CreateUserInput
-  ):Promise<UserEntity> {
+  ):Promise<AuthResponse> {
     if(!data.password){
       throw new Error("phone is required")
     }
@@ -54,7 +67,12 @@ export class UserResolver {
       password: hashPassword
     } as UserEntity)
     await user.save()
-    return user
+    const {accessToken, refreshToken} = createTokens(user.id)
+    return {
+      user, 
+      accessToken,
+      refreshToken
+    };
   }
 
   @Mutation(() => UserEntity)
